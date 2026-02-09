@@ -53,3 +53,59 @@ pub fn format_message(raw: &str) -> String {
 
     msg.trim().to_string()
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn clean_message() {
+        assert_eq!(format_message("feat: add login"), "feat: add login");
+    }
+
+    #[test]
+    fn strips_surrounding_quotes() {
+        assert_eq!(format_message("\"feat: add login\""), "feat: add login");
+        assert_eq!(format_message("'fix: typo'"), "fix: typo");
+    }
+
+    #[test]
+    fn strips_code_block() {
+        let input = "```\nfeat: add login\n```";
+        assert_eq!(format_message(input), "feat: add login");
+    }
+
+    #[test]
+    fn strips_code_block_with_lang() {
+        let input = "```text\nfeat: add login\n```";
+        assert_eq!(format_message(input), "feat: add login");
+    }
+
+    #[test]
+    fn strips_commit_message_prefix() {
+        assert_eq!(
+            format_message("Commit message: feat: add login"),
+            "feat: add login"
+        );
+        assert_eq!(format_message("commit: fix: typo"), "fix: typo");
+    }
+
+    #[test]
+    fn preserves_multiline() {
+        let input = "feat: add login\n\nImplement JWT auth";
+        assert_eq!(format_message(input), input);
+    }
+
+    #[test]
+    fn trims_whitespace() {
+        assert_eq!(format_message("  feat: add login  \n"), "feat: add login");
+    }
+
+    #[test]
+    fn wraps_long_title() {
+        let input = "feat: this is a very long commit message title that definitely exceeds the seventy two character limit for git";
+        let result = format_message(input);
+        let first_line = result.lines().next().unwrap();
+        assert!(first_line.len() <= 72);
+    }
+}

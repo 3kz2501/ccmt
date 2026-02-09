@@ -95,7 +95,7 @@ pub fn build_edit_prompt(
     parts.join("\n\n")
 }
 
-fn truncate_diff(diff: &str, max_length: usize) -> String {
+pub fn truncate_diff(diff: &str, max_length: usize) -> String {
     if diff.len() <= max_length {
         return diff.to_string();
     }
@@ -128,4 +128,103 @@ fn truncate_diff(diff: &str, max_length: usize) -> String {
     }
 
     result
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::config::Config;
+
+    fn default_config() -> Config {
+        Config::default()
+    }
+
+    #[test]
+    fn system_prompt_includes_conventional() {
+        let config = default_config();
+        let prompt = build_system_prompt(&config);
+        assert!(prompt.contains("Conventional Commits"));
+    }
+
+    #[test]
+    fn system_prompt_excludes_conventional_when_disabled() {
+        let mut config = default_config();
+        config.commit.conventional = false;
+        let prompt = build_system_prompt(&config);
+        assert!(!prompt.contains("Conventional Commits"));
+    }
+
+    #[test]
+    fn system_prompt_includes_emoji_when_enabled() {
+        let mut config = default_config();
+        config.commit.emoji = true;
+        let prompt = build_system_prompt(&config);
+        assert!(prompt.contains("Gitmoji"));
+    }
+
+    #[test]
+    fn system_prompt_japanese() {
+        let mut config = default_config();
+        config.commit.language = "ja".to_string();
+        let prompt = build_system_prompt(&config);
+        assert!(prompt.contains("Japanese"));
+    }
+
+    #[test]
+    fn system_prompt_custom_system() {
+        let mut config = default_config();
+        config.prompt.system = "Always mention the ticket number.".to_string();
+        let prompt = build_system_prompt(&config);
+        assert!(prompt.contains("Always mention the ticket number."));
+    }
+
+    #[test]
+    fn user_prompt_includes_diff() {
+        let prompt = build_user_prompt("+ added line", "", None, 8000);
+        assert!(prompt.contains("+ added line"));
+    }
+
+    #[test]
+    fn user_prompt_includes_hint() {
+        let prompt = build_user_prompt("diff", "", Some("auth refactor"), 8000);
+        assert!(prompt.contains("Context: auth refactor"));
+    }
+
+    #[test]
+    fn user_prompt_includes_status() {
+        let prompt = build_user_prompt("diff", "M src/main.rs", None, 8000);
+        assert!(prompt.contains("M src/main.rs"));
+    }
+
+    #[test]
+    fn truncate_diff_short() {
+        let diff = "short diff";
+        assert_eq!(truncate_diff(diff, 100), diff);
+    }
+
+    #[test]
+    fn truncate_diff_long() {
+        let diff = format!(
+            "diff --git a/file1\n{}\ndiff --git a/file2\n{}",
+            "a".repeat(100),
+            "b".repeat(100)
+        );
+        let result = truncate_diff(&diff, 150);
+        assert!(result.contains("truncated"));
+        assert!(result.len() <= 250); // some overhead from the truncation message
+    }
+
+    #[test]
+    fn edit_prompt_includes_previous_and_instruction() {
+        let prompt = build_edit_prompt(
+            "diff content",
+            "",
+            "feat: old message",
+            "change scope to auth",
+            None,
+            8000,
+        );
+        assert!(prompt.contains("feat: old message"));
+        assert!(prompt.contains("change scope to auth"));
+    }
 }

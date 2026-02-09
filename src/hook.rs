@@ -1,6 +1,5 @@
 use anyhow::{Context, Result, bail};
 use std::fs;
-use std::os::unix::fs::PermissionsExt;
 use std::path::PathBuf;
 
 const HOOK_CONTENT: &str = r#"#!/bin/sh
@@ -53,7 +52,12 @@ pub fn install() -> Result<()> {
     }
 
     fs::write(&path, HOOK_CONTENT)?;
-    fs::set_permissions(&path, fs::Permissions::from_mode(0o755))?;
+
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        fs::set_permissions(&path, fs::Permissions::from_mode(0o755))?;
+    }
 
     println!("Installed prepare-commit-msg hook at {}", path.display());
     Ok(())

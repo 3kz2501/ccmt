@@ -223,6 +223,15 @@ pub fn init_config() -> Result<()> {
     Ok(())
 }
 
+/// Make apply_partial accessible for testing
+#[cfg(test)]
+impl Config {
+    pub fn test_apply_partial_toml(&mut self, toml_str: &str) {
+        let partial: PartialConfig = toml::from_str(toml_str).unwrap();
+        self.apply_partial(partial);
+    }
+}
+
 /// Show the fully merged config
 pub fn show_config(
     provider_override: Option<&str>,
@@ -233,4 +242,123 @@ pub fn show_config(
     let content = toml::to_string_pretty(&config)?;
     println!("{content}");
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn default_config_values() {
+        let config = Config::default();
+        assert_eq!(config.auth.provider, "cli");
+        assert_eq!(config.auth.model, "sonnet");
+        assert!(config.auth.api_key.is_empty());
+        assert!(config.commit.conventional);
+        assert!(!config.commit.emoji);
+        assert_eq!(config.commit.language, "en");
+        assert!(!config.commit.auto_stage);
+        assert!(!config.commit.auto_push);
+        assert!(config.commit.confirm);
+        assert!(config.prompt.system.is_empty());
+        assert_eq!(config.prompt.max_diff_length, 8000);
+    }
+
+    #[test]
+    fn partial_merge_overrides_only_specified() {
+        let mut config = Config::default();
+        config.test_apply_partial_toml(
+            r#"
+            [commit]
+            language = "ja"
+            "#,
+        );
+        assert_eq!(config.commit.language, "ja");
+        // Other fields remain default
+        assert!(config.commit.conventional);
+        assert_eq!(config.auth.provider, "cli");
+    }
+
+    #[test]
+    fn partial_merge_auth() {
+        let mut config = Config::default();
+        config.test_apply_partial_toml(
+            r#"
+            [auth]
+            provider = "api"
+            model = "haiku"
+            "#,
+        );
+        assert_eq!(config.auth.provider, "api");
+        assert_eq!(config.auth.model, "haiku");
+        assert!(config.auth.api_key.is_empty());
+    }
+
+    #[test]
+    fn partial_merge_multiple_sections() {
+        let mut config = Config::default();
+        config.test_apply_partial_toml(
+            r#"
+            [auth]
+            provider = "api"
+
+            [commit]
+            emoji = true
+            language = "ja"
+
+            [prompt]
+            max_diff_length = 4000
+            "#,
+        );
+        assert_eq!(config.auth.provider, "api");
+        assert!(config.commit.emoji);
+        assert_eq!(config.commit.language, "ja");
+        assert_eq!(config.prompt.max_diff_length, 4000);
+    }
+
+    #[test]
+    fn partial_merge_stacks() {
+        let mut config = Config::default();
+        // Simulate global config
+        config.test_apply_partial_toml(
+            r#"
+            [auth]
+            provider = "api"
+            api_key = "sk-test"
+
+            [commit]
+            language = "ja"
+            "#,
+        );
+        // Simulate project config overriding language
+        config.test_apply_partial_toml(
+            r#"
+            [commit]
+            language = "en"
+            "#,
+        );
+        assert_eq!(config.auth.provider, "api");
+        assert_eq!(config.auth.api_key, "sk-test");
+        assert_eq!(config.commit.language, "en");
+    }
+
+    #[test]
+    fn empty_partial_changes_nothing() {
+        let mut config = Config::default();
+        let original = config.clone();
+        config.test_apply_partial_toml("");
+        assert_eq!(config.auth.provider, original.auth.provider);
+        assert_eq!(config.commit.language, original.commit.language);
+        assert_eq!(
+            config.prompt.max_diff_length,
+            original.prompt.max_diff_length
+        );
+    }
+
+    #[test]
+    fn default_config_serializes_to_valid_toml() {
+        let config = Config::default();
+        let toml_str = toml::to_string_pretty(&config).unwrap();
+        let _: PartialConfig = toml::from_str(&toml_str).unwrap();
+    }
 }
