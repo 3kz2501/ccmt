@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2024"
 description = "AI-powered commit message generator using Claude"
 license = "MIT"
-repository = "https://github.com/kz/ccm"
+repository = "https://github.com/3kz2501/ccm"
 keywords = ["git", "commit", "ai", "claude", "cli"]
 categories = ["command-line-utilities", "development-tools"]
 
