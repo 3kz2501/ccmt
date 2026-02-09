@@ -1,0 +1,46 @@
+name: Bump Version
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "New version (e.g., 0.2.0)"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  bump:
+    name: Bump to ${{ inputs.version }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Update version
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          sed -i "s/^version = \".*\"/version = \"${VERSION}\"/" Cargo.toml
+          cargo update --workspace
+
+      - name: Create Pull Request
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ inputs.version }}
+        run: |
+          BRANCH="release/v${VERSION}"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$BRANCH"
+          git add Cargo.toml Cargo.lock
+          git commit -m "release: v${VERSION}"
+          git push origin "$BRANCH"
+          gh pr create \
+            --title "release: v${VERSION}" \
+            --body "Automated version bump to ${VERSION}. Merge to trigger release." \
+            --label "release"
