@@ -40,13 +40,15 @@ cargo install --path .
 
 ## 前提条件
 
-**Claude CLI プロバイダー**（デフォルト）:
+- [Git](https://git-scm.com/)
+- [Rust](https://www.rust-lang.org/tools/install)（ソースビルド / `cargo install` の場合）
 
-- [Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code) がインストール・認証済みであること
+加えて、使用するプロバイダーに応じて以下が必要です：
 
-**API プロバイダー**:
-
-- [Anthropic API キー](https://console.anthropic.com/)
+| プロバイダー | 必要なもの |
+|-------------|-----------|
+| `cli`（デフォルト） | [Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code) がインストール・認証済み |
+| `api` | [Anthropic API キー](https://console.anthropic.com/) |
 
 ## クイックスタート
 

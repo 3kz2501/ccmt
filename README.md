@@ -40,13 +40,15 @@ Download the pre-built binary for your platform from the [Releases](https://gith
 
 ## Prerequisites
 
-**Claude CLI provider** (default):
+- [Git](https://git-scm.com/)
+- [Rust](https://www.rust-lang.org/tools/install) (for building from source / `cargo install`)
 
-- [Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code) installed and authenticated
+Plus one of the following, depending on your provider:
 
-**API provider**:
-
-- An [Anthropic API key](https://console.anthropic.com/)
+| Provider | Requirement |
+|----------|-------------|
+| `cli` (default) | [Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code) installed and authenticated |
+| `api` | [Anthropic API key](https://console.anthropic.com/) |
 
 ## Quick Start
 
