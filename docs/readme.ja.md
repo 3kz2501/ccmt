@@ -1,4 +1,4 @@
-# ccm
+# ccmt
 
 Claude を使った AI コミットメッセージジェネレーター。
 
@@ -23,20 +23,20 @@ Claude を使った AI コミットメッセージジェネレーター。
 ### crates.io から
 
 ```bash
-cargo install ccm
+cargo install ccmt
 ```
 
 ### ソースから
 
 ```bash
-git clone https://github.com/kz/ccm.git
-cd ccm
+git clone https://github.com/3kz2501/ccmt.git
+cd ccmt
 cargo install --path .
 ```
 
 ### GitHub Releases から
 
-[Releases](https://github.com/kz/ccm/releases) ページからプラットフォーム別のバイナリをダウンロードできます。
+[Releases](https://github.com/3kz2501/ccmt/releases) ページからプラットフォーム別のバイナリをダウンロードできます。
 
 ## 前提条件
 
@@ -57,16 +57,16 @@ cargo install --path .
 git add .
 
 # メッセージ生成してコミット
-ccm
+ccmt
 
 # コミットせずにプレビュー
-ccm --dry-run
+ccmt --dry-run
 ```
 
 ## 使い方
 
 ```
-USAGE: ccm [OPTIONS] [COMMAND]
+USAGE: ccmt [OPTIONS] [COMMAND]
 
 COMMANDS:
   config init     デフォルトのグローバル設定ファイルを生成
@@ -89,25 +89,25 @@ OPTIONS:
 
 ```bash
 # 基本的な使い方
-ccm
+ccmt
 
 # コンテキストヒント付き
-ccm -m "認証モジュールをテスタビリティ向上のためリファクタリング"
+ccmt -m "認証モジュールをテスタビリティ向上のためリファクタリング"
 
 # 日本語でコミットメッセージ
-ccm --language ja
+ccmt --language ja
 
 # CLI の代わりに API を使用
-ccm --provider api
+ccmt --provider api
 
 # 特定モデルで dry-run
-ccm --dry-run --model haiku
+ccmt --dry-run --model haiku
 
 # コミット後に自動 push
-ccm --push
+ccmt --push
 
 # 非対話モード（CI / スクリプト向け）
-ccm --no-confirm
+ccmt --no-confirm
 ```
 
 ## 確認フロー
@@ -133,16 +133,16 @@ feat(auth): JWT トークン検証を追加
 
 ## 設定
 
-ccm は設定ファイルなしでもデフォルト値で動作します。カスタマイズしたい場合のみ設定ファイルを作成してください。
+ccmt は設定ファイルなしでもデフォルト値で動作します。カスタマイズしたい場合のみ設定ファイルを作成してください。
 
 ### 設定ファイルの生成
 
 ```bash
-ccm config init    # ~/.config/ccm/config.toml を作成
-ccm config show    # マージ済みの設定を表示
+ccmt config init    # ~/.config/ccmt/config.toml を作成
+ccmt config show    # マージ済みの設定を表示
 ```
 
-### グローバル設定 (`~/.config/ccm/config.toml`)
+### グローバル設定 (`~/.config/ccmt/config.toml`)
 
 ```toml
 [auth]
@@ -163,9 +163,9 @@ system = ""             # カスタムシステムプロンプト（デフォル
 max_diff_length = 8000  # AI に送る diff の最大文字数
 ```
 
-### プロジェクト設定 (`.ccm.toml`)
+### プロジェクト設定 (`.ccmt.toml`)
 
-プロジェクトルート（または親ディレクトリ）に `.ccm.toml` を配置すると、プロジェクト単位で設定を上書きできます。上書きしたいフィールドのみ記載してください：
+プロジェクトルート（または親ディレクトリ）に `.ccmt.toml` を配置すると、プロジェクト単位で設定を上書きできます。上書きしたいフィールドのみ記載してください：
 
 ```toml
 [commit]
@@ -178,8 +178,8 @@ conventional = true
 設定は以下の順にマージされます（後のものが優先）：
 
 1. ハードコードされたデフォルト値
-2. `~/.config/ccm/config.toml`（グローバル）
-3. `.ccm.toml`（プロジェクト、cwd から親方向に探索）
+2. `~/.config/ccmt/config.toml`（グローバル）
+3. `.ccmt.toml`（プロジェクト、cwd から親方向に探索）
 4. CLI フラグ（最優先）
 
 ### 環境変数
@@ -195,7 +195,7 @@ conventional = true
 [Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code) をサブプロセスとして使用します。Claude CLI のインストールと認証が必要です。
 
 ```bash
-ccm --provider cli
+ccmt --provider cli
 ```
 
 ### `api`
@@ -204,12 +204,12 @@ Anthropic Messages API への直接 HTTP 呼び出し。API キーが必要で�
 
 ```bash
 # 設定ファイル経由
-ccm config init
-# ~/.config/ccm/config.toml を編集: provider = "api", api_key = "sk-ant-..."
+ccmt config init
+# ~/.config/ccmt/config.toml を編集: provider = "api", api_key = "sk-ant-..."
 
 # または環境変数経由
 export ANTHROPIC_API_KEY="sk-ant-..."
-ccm --provider api
+ccmt --provider api
 ```
 
 ### モデルエイリアス
@@ -227,11 +227,11 @@ ccm --provider api
 `prepare-commit-msg` hook をインストールすると、`git commit` 時にメッセージを自動生成できます：
 
 ```bash
-ccm hook install    # .git/hooks/prepare-commit-msg にインストール
-ccm hook remove     # 削除（バックアップがあれば復元）
+ccmt hook install    # .git/hooks/prepare-commit-msg にインストール
+ccmt hook remove     # 削除（バックアップがあれば復元）
 ```
 
-hook インストール後は `git commit` を実行するだけで、ccm が自動的にコミットメッセージを生成します。マージコミットやスカッシュコミットでは hook はスキップされます。
+hook インストール後は `git commit` を実行するだけで、ccmt が自動的にコミットメッセージを生成します。マージコミットやスカッシュコミットでは hook はスキップされます。
 
 ## プロジェクト構成
 

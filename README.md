@@ -1,4 +1,4 @@
-# ccm
+# ccmt
 
 AI-powered commit message generator using Claude.
 
@@ -23,20 +23,20 @@ Generates meaningful commit messages from your staged git diff using Claude CLI 
 ### From crates.io
 
 ```bash
-cargo install ccm
+cargo install ccmt
 ```
 
 ### From source
 
 ```bash
-git clone https://github.com/kz/ccm.git
-cd ccm
+git clone https://github.com/3kz2501/ccmt.git
+cd ccmt
 cargo install --path .
 ```
 
 ### From GitHub Releases
 
-Download the pre-built binary for your platform from the [Releases](https://github.com/kz/ccm/releases) page.
+Download the pre-built binary for your platform from the [Releases](https://github.com/3kz2501/ccmt/releases) page.
 
 ## Prerequisites
 
@@ -57,16 +57,16 @@ Plus one of the following, depending on your provider:
 git add .
 
 # Generate and commit
-ccm
+ccmt
 
 # Or preview without committing
-ccm --dry-run
+ccmt --dry-run
 ```
 
 ## Usage
 
 ```
-USAGE: ccm [OPTIONS] [COMMAND]
+USAGE: ccmt [OPTIONS] [COMMAND]
 
 COMMANDS:
   config init     Generate default global config
@@ -89,30 +89,30 @@ OPTIONS:
 
 ```bash
 # Basic usage
-ccm
+ccmt
 
 # With context hint
-ccm -m "refactored auth module for better testability"
+ccmt -m "refactored auth module for better testability"
 
 # Japanese commit messages
-ccm --language ja
+ccmt --language ja
 
 # Use API instead of CLI
-ccm --provider api
+ccmt --provider api
 
 # Dry-run with a specific model
-ccm --dry-run --model haiku
+ccmt --dry-run --model haiku
 
 # Auto-push after commit
-ccm --push
+ccmt --push
 
 # Non-interactive (CI/scripts)
-ccm --no-confirm
+ccmt --no-confirm
 ```
 
 ## Confirmation Flow
 
-When `confirm = true` (default), ccm presents an interactive prompt:
+When `confirm = true` (default), ccmt presents an interactive prompt:
 
 ```
 Generated commit message:
@@ -133,16 +133,16 @@ Selecting **Edit** lets you describe what to change. Claude regenerates the mess
 
 ## Configuration
 
-ccm works with zero configuration using sensible defaults. Optionally customize via config files.
+ccmt works with zero configuration using sensible defaults. Optionally customize via config files.
 
 ### Generate Config
 
 ```bash
-ccm config init    # Creates ~/.config/ccm/config.toml
-ccm config show    # Shows the merged config
+ccmt config init    # Creates ~/.config/ccmt/config.toml
+ccmt config show    # Shows the merged config
 ```
 
-### Global Config (`~/.config/ccm/config.toml`)
+### Global Config (`~/.config/ccmt/config.toml`)
 
 ```toml
 [auth]
@@ -163,9 +163,9 @@ system = ""             # Custom system prompt (appended to default)
 max_diff_length = 8000  # Max diff characters sent to AI
 ```
 
-### Project Config (`.ccm.toml`)
+### Project Config (`.ccmt.toml`)
 
-Place a `.ccm.toml` in your project root (or any parent directory) to override settings per-project. Only include the fields you want to override:
+Place a `.ccmt.toml` in your project root (or any parent directory) to override settings per-project. Only include the fields you want to override:
 
 ```toml
 [commit]
@@ -178,8 +178,8 @@ conventional = true
 Settings are merged in this order (later wins):
 
 1. Hardcoded defaults
-2. `~/.config/ccm/config.toml` (global)
-3. `.ccm.toml` (project, searched from cwd upward)
+2. `~/.config/ccmt/config.toml` (global)
+3. `.ccmt.toml` (project, searched from cwd upward)
 4. CLI flags (highest priority)
 
 ### Environment Variables
@@ -195,7 +195,7 @@ Settings are merged in this order (later wins):
 Uses the [Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code) as a subprocess. Requires Claude CLI to be installed and authenticated.
 
 ```bash
-ccm --provider cli
+ccmt --provider cli
 ```
 
 ### `api`
@@ -204,15 +204,15 @@ Direct HTTP calls to the Anthropic Messages API. Requires an API key.
 
 ```bash
 # Via config
-ccm config init
-# Edit ~/.config/ccm/config.toml: provider = "api", api_key = "sk-ant-..."
+ccmt config init
+# Edit ~/.config/ccmt/config.toml: provider = "api", api_key = "sk-ant-..."
 
 # Or via environment variable
 export ANTHROPIC_API_KEY="sk-ant-..."
-ccm --provider api
+ccmt --provider api
 
 # Or one-off
-ccm --provider api  # Uses ANTHROPIC_API_KEY env var
+ccmt --provider api  # Uses ANTHROPIC_API_KEY env var
 ```
 
 ### Model Aliases
@@ -230,11 +230,11 @@ You can also pass a full model ID: `--model claude-sonnet-4-5-20250929`
 Install a `prepare-commit-msg` hook to auto-generate messages for `git commit`:
 
 ```bash
-ccm hook install    # Installs to .git/hooks/prepare-commit-msg
-ccm hook remove     # Removes (restores backup if exists)
+ccmt hook install    # Installs to .git/hooks/prepare-commit-msg
+ccmt hook remove     # Removes (restores backup if exists)
 ```
 
-With the hook installed, running `git commit` will automatically populate the commit message using ccm. The hook is skipped for merge and squash commits.
+With the hook installed, running `git commit` will automatically populate the commit message using ccmt. The hook is skipped for merge and squash commits.
 
 ## Project Structure
 

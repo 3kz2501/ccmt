@@ -1,11 +1,10 @@
 use anyhow::{Context, Result, bail};
 use std::fs;
-use std::os::unix::fs::PermissionsExt;
 use std::path::PathBuf;
 
 const HOOK_CONTENT: &str = r#"#!/bin/sh
-# Installed by ccm - AI commit message generator
-# This hook generates a commit message using ccm
+# Installed by ccmt - AI commit message generator
+# This hook generates a commit message using ccmt
 
 # Only run for normal commits (not merge, squash, etc.)
 case "$2" in
@@ -15,7 +14,7 @@ case "$2" in
 esac
 
 # Generate message and write to commit message file
-MSG=$(ccm --dry-run --no-confirm 2>/dev/null)
+MSG=$(ccmt --dry-run --no-confirm 2>/dev/null)
 if [ $? -eq 0 ] && [ -n "$MSG" ]; then
     echo "$MSG" > "$1"
 fi
@@ -53,7 +52,12 @@ pub fn install() -> Result<()> {
     }
 
     fs::write(&path, HOOK_CONTENT)?;
-    fs::set_permissions(&path, fs::Permissions::from_mode(0o755))?;
+
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        fs::set_permissions(&path, fs::Permissions::from_mode(0o755))?;
+    }
 
     println!("Installed prepare-commit-msg hook at {}", path.display());
     Ok(())
@@ -69,9 +73,9 @@ pub fn remove() -> Result<()> {
 
     // Check if it's our hook
     let content = fs::read_to_string(&path)?;
-    if !content.contains("ccm") {
+    if !content.contains("ccmt") {
         bail!(
-            "Hook at {} was not installed by ccm. Remove manually if intended.",
+            "Hook at {} was not installed by ccmt. Remove manually if intended.",
             path.display()
         );
     }

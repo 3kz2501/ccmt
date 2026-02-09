@@ -49,19 +49,19 @@ jobs:
         if: matrix.archive == 'tar.gz'
         run: |
           cd target/${{ matrix.target }}/release
-          tar czf ../../../ccm-${{ matrix.target }}.tar.gz ccm
+          tar czf ../../../ccmt-${{ matrix.target }}.tar.gz ccmt
           cd ../../..
 
       - name: Package (windows)
         if: matrix.archive == 'zip'
         shell: pwsh
         run: |
-          Compress-Archive -Path "target/${{ matrix.target }}/release/ccm.exe" -DestinationPath "ccm-${{ matrix.target }}.zip"
+          Compress-Archive -Path "target/${{ matrix.target }}/release/ccmt.exe" -DestinationPath "ccmt-${{ matrix.target }}.zip"
 
       - uses: actions/upload-artifact@v4
         with:
-          name: ccm-${{ matrix.target }}
-          path: ccm-${{ matrix.target }}.*
+          name: ccmt-${{ matrix.target }}
+          path: ccmt-${{ matrix.target }}.*
 
   release:
     name: Create Release
