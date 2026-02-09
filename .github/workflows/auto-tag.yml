@@ -26,3 +26,11 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git tag -a "$VERSION" -m "$VERSION"
           git push origin "$VERSION"
+
+      - name: Trigger release workflow
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH_NAME: ${{ github.event.pull_request.head.ref }}
+        run: |
+          VERSION="${BRANCH_NAME#release/}"
+          gh workflow run release.yml --ref "$VERSION"
