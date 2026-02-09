@@ -139,17 +139,17 @@ impl Config {
     }
 }
 
-/// Get the global config file path: ~/.config/ccm/config.toml
+/// Get the global config file path: ~/.config/ccmt/config.toml
 pub fn global_config_path() -> Result<PathBuf> {
     let config_dir = dirs::config_dir().context("Could not determine config directory")?;
-    Ok(config_dir.join("ccm").join("config.toml"))
+    Ok(config_dir.join("ccmt").join("config.toml"))
 }
 
-/// Search for .ccm.toml starting from `start_dir` and walking up to /
+/// Search for .ccmt.toml starting from `start_dir` and walking up to /
 fn find_project_config(start_dir: &Path) -> Option<PathBuf> {
     let mut dir = start_dir.to_path_buf();
     loop {
-        let candidate = dir.join(".ccm.toml");
+        let candidate = dir.join(".ccmt.toml");
         if candidate.is_file() {
             return Some(candidate);
         }

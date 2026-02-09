@@ -99,7 +99,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "ccm"
+name = "ccmt"
 version = "0.1.0"
 dependencies = [
  "anyhow",
