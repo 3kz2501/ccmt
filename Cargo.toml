@@ -1,0 +1,20 @@
+[package]
+name = "ccm"
+version = "0.1.0"
+edition = "2024"
+description = "AI-powered commit message generator using Claude"
+license = "MIT"
+repository = "https://github.com/kz/ccm"
+keywords = ["git", "commit", "ai", "claude", "cli"]
+categories = ["command-line-utilities", "development-tools"]
+
+[dependencies]
+clap = { version = "4", features = ["derive"] }
+serde = { version = "1", features = ["derive"] }
+toml = "0.8"
+anyhow = "1"
+colored = "2"
+dialoguer = "0.11"
+reqwest = { version = "0.12", features = ["blocking", "json"] }
+serde_json = "1"
+dirs = "6"
