@@ -7,6 +7,7 @@ pub struct ClaudeCliProvider;
 impl Provider for ClaudeCliProvider {
     fn generate(&self, prompt: &str, system: &str, model: &str) -> Result<String> {
         let mut cmd = Command::new("claude");
+        cmd.env_remove("ANTHROPIC_API_KEY");
         cmd.args(["-p", prompt, "--output-format", "text"]);
 
         if !system.is_empty() {
@@ -22,8 +23,10 @@ impl Provider for ClaudeCliProvider {
             .context("Failed to run 'claude' CLI. Is it installed? Install with: npm install -g @anthropic-ai/claude-code")?;
 
         if !output.status.success() {
-            let stderr = String::from_utf8_lossy(&output.stderr);
-            bail!("claude CLI failed: {}", stderr.trim());
+            let stderr = String::from_utf8_lossy(&output.stderr).trim().to_string();
+            let stdout = String::from_utf8_lossy(&output.stdout).trim().to_string();
+            let detail = if stderr.is_empty() { &stdout } else { &stderr };
+            bail!("claude CLI failed: {}", detail);
         }
 
         let text = String::from_utf8_lossy(&output.stdout).trim().to_string();
